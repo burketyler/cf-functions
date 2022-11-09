@@ -1,0 +1,35 @@
+{
+  "name": "cf-functions",
+  "version": "1.0.0",
+  "description": "Framework for creating, testing and deploying AWS CloudFront Functions.",
+  "main": "index.js",
+  "type": "module",
+  "bin": ".build/src/cli/index.js",
+  "repository": "https://github.com/burketyler/cf-functions",
+  "author": "burketyler",
+  "license": "MIT",
+  "scripts": {
+    "cli": "ts-node-esm src/cli/index.ts"
+  },
+  "dependencies": {
+    "aws-sdk": "2.1248.0",
+    "chalk": "5.1.2",
+    "joi": "17.7.0",
+    "yargs": "17.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.9",
+    "@types/yargs": "17.0.13",
+    "@typescript-eslint/eslint-plugin": "5.42.0",
+    "@typescript-eslint/parser": "5.42.0",
+    "eslint": "8.27.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-import-resolver-typescript": "3.5.2",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "ora": "6.1.2",
+    "prettier": "2.7.1",
+    "ts-node": "10.9.1",
+    "typescript": "4.8.4"
+  }
+}
