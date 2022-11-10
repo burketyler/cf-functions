@@ -64,7 +64,7 @@ export class LogBuilder {
   public list(items: LogListItem[], indent = 0): LogBuilder {
     items.forEach((item, index) => {
       const bullet =
-        item.bullet === "numbered" ? index + 1 : item.bullet ?? "-";
+        item.bullet === "numbered" ? `${index + 1}.` : item.bullet ?? "-";
 
       this.write(
         `${" ".repeat(item.indent ?? indent)} ${bullet} ${item.message}`,

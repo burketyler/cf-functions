@@ -1,10 +1,10 @@
 import { FunctionResult } from "../../../aws/index.js";
 import { LogBuilder } from "../../../logging/builder.js";
-import { FnError } from "../../types.js";
+import { FunctionResultError } from "../../types.js";
 
-export function printSuccessList(
+export function printFunctionResultList(
   message: string,
-  successList: FunctionResult[]
+  results: FunctionResult[]
 ) {
   new LogBuilder({
     color: "yellow",
@@ -12,7 +12,7 @@ export function printSuccessList(
   })
     .break(2)
     .list(
-      successList.map(({ summary, eTag }) => ({
+      results.map(({ summary, eTag }) => ({
         message: summary.Name,
         color: "cyan",
         children: [
@@ -27,15 +27,18 @@ export function printSuccessList(
     .log();
 }
 
-export function printRejected(message: string, rejectList: FnError[]) {
+export function printFunctionResultErrorList(
+  message: string,
+  errors: FunctionResultError[]
+) {
   new LogBuilder({
     color: "red",
     message: `\n${message}:`,
   })
     .break(2)
     .list(
-      rejectList.map(({ fn, error }) => ({
-        message: fn.name,
+      errors.map(({ functionInputs, error }) => ({
+        message: functionInputs.name,
         children: [
           {
             bullet: "",

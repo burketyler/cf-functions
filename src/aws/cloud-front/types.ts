@@ -15,11 +15,6 @@ export interface FunctionResult {
   summary: FunctionSummary;
 }
 
-export interface DistributionResult {
-  eTag: string;
-  config: DistributionConfig;
-}
-
 export enum FunctionStage {
   DEVELOPMENT = "DEVELOPMENT",
   LIVE = "LIVE",
@@ -29,7 +24,13 @@ export enum FunctionRuntime {
   "1.0" = "cloudfront-js-1.0",
 }
 
-export enum FunctionEventType {
+export interface DistributionResult {
+  id: string;
+  eTag: string;
+  config: DistributionConfig;
+}
+
+export enum DistributionEventType {
   VIEWER_REQUEST = "viewer-request",
   VIEWER_RESPONSE = "viewer-response",
 }

@@ -9,8 +9,11 @@ import {
   updateFunction,
 } from "../../../aws/index.js";
 import { logger } from "../../../logging/index.js";
-import { FnError } from "../../types.js";
-import { getFunctionManifest, settleAndPrintResults } from "../../utils.js";
+import { FunctionResultError } from "../../types.js";
+import {
+  getFunctionManifest,
+  settleAndPrintFunctionResults,
+} from "../../utils.js";
 
 import { StageArgs } from "./types.js";
 
@@ -32,47 +35,49 @@ const handler = async (args: StageArgs) => {
 
   logger.info("Starting command 'stage'.");
 
-  const { configFns, deployedFns } = await getFunctionManifest(
+  const { fnInputs, deployedFns } = await getFunctionManifest(
     args.config,
     stage
   );
 
-  logger.info(`Staging ${configFns.length} functions in ${stage}:\n`);
+  logger.info(`Staging ${fnInputs.length} functions in ${stage}:\n`);
 
-  const resultsPromise = configFns.map(async (fn) => {
+  const resultsPromise = fnInputs.map(async (functionInputs) => {
     const progress = ora({
       indent: 2,
-      text: `Deploying ${fn.name}...`,
+      text: `Deploying ${functionInputs.name}`,
     }).start();
 
     try {
       let result: FunctionResult;
 
-      const liveFn = deployedFns.find((depFn) => depFn.Name === fn.name);
+      const liveFn = deployedFns.find(
+        (depFn) => depFn.Name === functionInputs.name
+      );
 
       if (liveFn) {
-        const { eTag } = await describeFunction(fn.name, stage);
+        const { eTag } = await describeFunction(functionInputs.name, stage);
 
-        result = await updateFunction(fn, eTag);
+        result = await updateFunction(functionInputs, eTag);
 
-        progress.succeed(`Staged ${fn.name}.`);
+        progress.succeed(`Staged ${functionInputs.name}.`);
 
         return result;
       } else {
-        result = await createFunction(fn);
+        result = await createFunction(functionInputs);
 
-        progress.succeed(`Staged ${fn.name}.`);
+        progress.succeed(`Staged ${functionInputs.name}.`);
 
         return result;
       }
     } catch (error) {
-      progress.fail(`Failed ${fn.name}.`);
+      progress.fail(`Failed ${functionInputs.name}.`);
 
-      throw { fn, error } as FnError;
+      throw { functionInputs, error } as FunctionResultError;
     }
   });
 
-  await settleAndPrintResults(
+  await settleAndPrintFunctionResults(
     {
       success: "Successfully staged functions",
       fail: "Failed to stage functions",

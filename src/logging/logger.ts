@@ -11,7 +11,7 @@ export function createLogger() {
     info,
     error,
     fatal,
-    printFunctionList,
+    printFunctionConfigList,
   };
 }
 
@@ -24,6 +24,7 @@ function fatal(...messages: string[]) {
     color: "yellow",
     breaks: 2,
   })
+    .break(1)
     .write("*******************")
     .write(" Error ", "red")
     .write("********************")
@@ -37,6 +38,7 @@ function fatal(...messages: string[]) {
       }))
     )
     .line("**********************************************")
+    .break(1)
     .log();
 }
 
@@ -51,16 +53,19 @@ function info(msg: string) {
   console.log(chalk.yellow(msg));
 }
 
-function printFunctionList(fnList: { [fnName: string]: FunctionConfig }) {
+function printFunctionConfigList(functionConfigMap: {
+  [functionName: string]: FunctionConfig;
+}) {
   new LogBuilder()
     .break()
     .list(
-      Object.entries(fnList).map(([fnName, config]) => ({
+      Object.entries(functionConfigMap).map(([fnName, config]) => ({
         message: fnName,
         color: "cyan",
         children: config.associations.map(
-          ({ distributionId: id, eventType: type }) => ({
-            message: `${id} [${type}]`,
+          ({ distributionId: id, behaviourPattern, eventType }) => ({
+            bullet: "numbered",
+            message: `${id} (Pattern: ${behaviourPattern}) [Event: ${eventType}]`,
             color: "greenBright",
           })
         ),

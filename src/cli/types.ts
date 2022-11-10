@@ -4,7 +4,7 @@ export interface DefaultArgs {
   config: string;
 }
 
-export interface FnError {
-  fn: FunctionInputs;
+export interface FunctionResultError {
+  functionInputs: FunctionInputs;
   error: Error;
 }

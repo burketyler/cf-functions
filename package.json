@@ -14,10 +14,12 @@
   "dependencies": {
     "aws-sdk": "2.1248.0",
     "chalk": "5.1.2",
+    "clone-deep": "4.0.1",
     "joi": "17.7.0",
     "yargs": "17.6.2"
   },
   "devDependencies": {
+    "@types/clone-deep": "4.0.1",
     "@types/node": "18.11.9",
     "@types/yargs": "17.0.13",
     "@typescript-eslint/eslint-plugin": "5.42.0",

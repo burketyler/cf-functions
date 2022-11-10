@@ -1,22 +1,23 @@
-import ora from "ora";
+import { join } from "path";
 import { CommandBuilder, CommandModule } from "yargs";
 
-import {
-  describeFunction,
-  FunctionStage,
-  publishFunction,
-} from "../../../aws/index.js";
+import { FunctionStage, listFunctions } from "../../../aws/index.js";
 import { logger } from "../../../logging/index.js";
 import { DEFAULT_ARGS } from "../../constants.js";
-import { FnError } from "../../types.js";
-import { getFunctionManifest, settleAndPrintResults } from "../../utils.js";
+import { parseConfigFile } from "../../utils.js";
 
 import { AssociateArgs } from "./types.js";
+import {
+  associateFunctionsWithDistribution,
+  createAssociationManifest,
+  pollDistributionForDeployedStatus,
+  settleAndPrintAssociateResults,
+} from "./utils.js";
 
 const command = "associate";
 
 const desc =
-  "Associate functions in 'LIVE' stage with configured CloudFront distributions.";
+  "Associate functions in 'LIVE' stage with configured CloudFront distribution behaviours.";
 
 const builder: CommandBuilder = {
   ...DEFAULT_ARGS,
@@ -25,59 +26,34 @@ const builder: CommandBuilder = {
 const handler = async (args: AssociateArgs) => {
   logger.info("Starting command 'associate'.");
 
-  const { configFns, deployedFns } = await getFunctionManifest(
-    args.config,
-    FunctionStage.LIVE
+  const [config, deployedFunctions] = await Promise.all([
+    parseConfigFile(join(process.cwd(), args.config)),
+    listFunctions(FunctionStage.LIVE),
+  ]);
+
+  logger.printFunctionConfigList(config.functions);
+
+  logger.info(`Associating functions with CloudFront Distributions:\n`);
+
+  const distAssociationMap = await createAssociationManifest(
+    config.functions,
+    deployedFunctions
   );
 
-  logger.info(
-    `Associating ${configFns.length} functions from ${FunctionStage.LIVE}:\n`
+  const associatePromises = Object.values(distAssociationMap).map(
+    async ({ associations, distribution }) =>
+      associateFunctionsWithDistribution(associations, distribution)
   );
 
-  const resultsPromise = configFns.map(async (fn) => {
-    const progress = ora({
-      indent: 2,
-      text: `Publishing ${fn.name}...`,
-    }).start();
+  await settleAndPrintAssociateResults(associatePromises);
 
-    const liveFn = deployedFns.find((depFn) => depFn.Name === fn.name);
-
-    if (!liveFn) {
-      throw {
-        fn,
-        error: new Error(
-          `Function is not staged in ${FunctionStage.DEVELOPMENT}.`
-        ),
-      };
-    }
-
-    try {
-      const { eTag } = await describeFunction(
-        fn.name,
-        FunctionStage.DEVELOPMENT
-      );
-
-      const result = await publishFunction(liveFn.Name, eTag);
-
-      progress.succeed(`Published ${liveFn.Name}`);
-
-      return { ...result, eTag };
-    } catch (error) {
-      progress.fail(`Failed ${fn.name}.`);
-
-      throw { fn, error } as FnError;
-    }
-  });
-
-  await settleAndPrintResults(
-    {
-      success: "Successfully published functions",
-      fail: "Failed to published functions",
-    },
-    resultsPromise
+  await Promise.allSettled(
+    Object.values(distAssociationMap).map(async ({ distribution }) =>
+      pollDistributionForDeployedStatus(distribution)
+    )
   );
 
-  logger.info("Finishing command 'publish'.");
+  logger.info("Finishing command 'associate'.");
 };
 
 export default {
@@ -85,4 +61,4 @@ export default {
   desc,
   builder,
   handler,
-} as CommandModule<{}, PublishArgs>; // eslint-disable-line @typescript-eslint/ban-types
+} as CommandModule<{}, AssociateArgs>; // eslint-disable-line @typescript-eslint/ban-types

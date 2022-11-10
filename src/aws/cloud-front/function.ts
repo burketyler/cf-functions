@@ -10,7 +10,7 @@ import { FunctionInputs, FunctionResult, FunctionStage } from "./types.js";
 const cf = new AWS.CloudFront();
 
 export async function listFunctions(
-  stage?: FunctionStage
+  stage: FunctionStage
 ): Promise<FunctionSummary[]> {
   let marker: string | undefined;
 
@@ -43,17 +43,17 @@ export async function describeFunction(
 }
 
 export async function createFunction(
-  fn: FunctionInputs
+  _function: FunctionInputs
 ): Promise<FunctionResult> {
   const result = await executeAwsRequest(
     cf
       .createFunction({
-        Name: fn.name,
+        Name: _function.name,
         FunctionConfig: {
-          Runtime: fn.runtime ?? DEFAULT_RUNTIME,
-          Comment: fn.description ?? DEFAULT_DESCR,
+          Runtime: _function.runtime ?? DEFAULT_RUNTIME,
+          Comment: _function.description ?? DEFAULT_DESCR,
         },
-        FunctionCode: fn.code,
+        FunctionCode: _function.code,
       })
       .promise()
   );
@@ -62,19 +62,19 @@ export async function createFunction(
 }
 
 export async function updateFunction(
-  fn: FunctionInputs,
+  _function: FunctionInputs,
   etag: string
 ): Promise<FunctionResult> {
   const result = await executeAwsRequest(
     cf
       .updateFunction({
         IfMatch: etag,
-        Name: fn.name,
+        Name: _function.name,
         FunctionConfig: {
-          Runtime: fn.runtime ?? DEFAULT_RUNTIME,
-          Comment: fn.description ?? DEFAULT_DESCR,
+          Runtime: _function.runtime ?? DEFAULT_RUNTIME,
+          Comment: _function.description ?? DEFAULT_DESCR,
         },
-        FunctionCode: fn.code,
+        FunctionCode: _function.code,
       })
       .promise()
   );

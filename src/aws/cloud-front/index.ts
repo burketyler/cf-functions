@@ -1,4 +1,4 @@
-export { getDistributionConfig, updateDistribution } from "./distribution.js";
+export { fetchDistribution, updateDistribution } from "./distribution.js";
 export {
   listFunctions,
   updateFunction,
@@ -7,6 +7,11 @@ export {
   describeFunction,
   publishFunction,
 } from "./function.js";
-export { FunctionRuntime, FunctionEventType, FunctionStage } from "./types.js";
+export {
+  FunctionRuntime,
+  DistributionEventType,
+  DistributionResult,
+  FunctionStage,
+} from "./types.js";
 
 export type { FunctionInputs, FunctionResult } from "./types.js";

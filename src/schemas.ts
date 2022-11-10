@@ -1,11 +1,11 @@
 import Joi from "joi";
 
-import { FunctionEventType, FunctionRuntime } from "./aws/index.js";
+import { DistributionEventType, FunctionRuntime } from "./aws/index.js";
 
 const associationSchema = Joi.object({
   distributionId: Joi.string().required(),
   eventType: Joi.string()
-    .valid(...Object.values(FunctionEventType))
+    .valid(...Object.values(DistributionEventType))
     .required(),
 }).required();
 

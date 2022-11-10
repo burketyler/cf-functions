@@ -1,3 +1,4 @@
+import { FunctionSummary } from "aws-sdk/clients/cloudfront.js";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
@@ -11,21 +12,35 @@ import { logger } from "../logging/index.js";
 import { configSchema } from "../schemas.js";
 import { Config } from "../types.js";
 
-import { printRejected, printSuccessList } from "./commands/stage/utils.js";
-import { FnError } from "./types.js";
+import {
+  printFunctionResultErrorList,
+  printFunctionResultList,
+} from "./commands/stage/utils.js";
+import { FunctionResultError } from "./types.js";
+
+export function findFunction(name: string, list: FunctionSummary[]) {
+  const fn = list.find((depFn) => depFn.Name === name);
+
+  if (!fn) {
+    throw new Error(`Function ${name} not found in AWS.`);
+  }
+
+  return fn;
+}
 
 export async function getFunctionManifest(
   configPath: string,
   stage: FunctionStage
 ): Promise<{
-  configFns: FunctionInputs[];
+  fnInputs: FunctionInputs[];
   deployedFns: Awaited<ReturnType<typeof listFunctions>>;
 }> {
-  const config = await parseConfigFile(join(process.cwd(), configPath));
+  const [config, deployedFns] = await Promise.all([
+    parseConfigFile(join(process.cwd(), configPath)),
+    listFunctions(stage),
+  ]);
 
-  logger.printFunctionList(config.functions);
-
-  const liveFns = await listFunctions(stage);
+  logger.printFunctionConfigList(config.functions);
 
   const configFns: FunctionInputs[] = Object.entries(config.functions).map(
     ([name, { runtime, description, handler }]) => ({
@@ -39,26 +54,26 @@ export async function getFunctionManifest(
   logger.info("Configurations loaded.");
 
   return {
-    configFns,
-    deployedFns: liveFns,
+    fnInputs: configFns,
+    deployedFns: deployedFns,
   };
 }
 
-export async function settleAndPrintResults(
+export async function settleAndPrintFunctionResults(
   messages: { success: string; fail: string },
   resultsPromise: Promise<FunctionResult>[]
 ) {
   const { successList, rejectList } = await settlePromises<
     FunctionResult,
-    FnError
+    FunctionResultError
   >(resultsPromise);
 
   if (successList?.[0]) {
-    printSuccessList(messages.success, successList);
+    printFunctionResultList(messages.success, successList);
   }
 
   if (rejectList?.[0]) {
-    printRejected(messages.fail, rejectList);
+    printFunctionResultErrorList(messages.fail, rejectList);
   }
 }
 
@@ -75,7 +90,7 @@ export async function parseConfigFile(path: string): Promise<Config> {
 
   const config: Config = (await import(path))?.default;
 
-  if (!config) {
+  if (!config || typeof config !== "object" || !config.functions) {
     logger.fatal(
       "Failed to import from config.",
       `File: '${path}'`,
@@ -127,4 +142,8 @@ export async function settlePromises<SuccessType, RejectType>(
 
     return accumulator;
   }, accumulator);
+}
+
+export function sleep(timeoutMs: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, timeoutMs));
 }

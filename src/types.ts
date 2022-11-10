@@ -1,24 +1,29 @@
 import type { FunctionRuntime } from "aws-sdk/clients/cloudfront.js";
 
-import { FunctionEventType } from "./aws/index.js";
+import { DistributionEventType } from "./aws/index.js";
 
 export interface Config {
-  functions: {
-    [functionName: string]: FunctionConfig;
-  };
+  functions: FunctionConfigMap;
   defaultRuntime?: FunctionRuntime;
   pathPrefix?: string;
+}
+
+export interface FunctionConfigMap {
+  [functionName: string]: FunctionConfig;
 }
 
 export interface FunctionConfig {
   handler: string;
   runtime: FunctionRuntime;
-  associations: FunctionAssociation[];
+  associations: FunctionAssociationConfig[];
   isEnabled?: boolean;
   description?: string;
 }
 
-export interface FunctionAssociation {
+export interface FunctionAssociationConfig {
   distributionId: string;
-  eventType: FunctionEventType;
+  eventType: DistributionEventType;
+  behaviourPattern: BehaviourPattern;
 }
+
+export type BehaviourPattern = "default" | string;

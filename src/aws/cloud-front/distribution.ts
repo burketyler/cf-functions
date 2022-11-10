@@ -8,28 +8,42 @@ import { DistributionResult } from "./types.js";
 
 const cf = new AWS.CloudFront();
 
-export async function getDistributionConfig(
+export async function fetchDistributionStatus(id: string): Promise<string> {
+  const result = await executeAwsRequest(
+    cf.getDistribution({ Id: id }).promise()
+  );
+
+  if (!result.Distribution?.Status) {
+    throw new Error(`Status not returned while fetching distribution ${id}.`);
+  }
+
+  return result.Distribution.Status;
+}
+
+export async function fetchDistribution(
   id: string
 ): Promise<DistributionResult> {
   const result = await executeAwsRequest(
     cf.getDistributionConfig({ Id: id }).promise()
   );
 
-  return parseDistributionResult(result);
+  return parseDistributionResult(id, result);
 }
 
 export async function updateDistribution(
-  id: string,
-  config: DistributionConfig
+  distribution: DistributionResult
 ): Promise<DistributionResult> {
+  const { id: Id, config: DistributionConfig, eTag: IfMatch } = distribution;
+
   const result = await executeAwsRequest(
-    cf.updateDistribution({ Id: id, DistributionConfig: config }).promise()
+    cf.updateDistribution({ Id, DistributionConfig, IfMatch }).promise()
   );
 
-  return parseDistributionResult(result);
+  return parseDistributionResult(Id, result);
 }
 
 function parseDistributionResult(
+  id: string,
   result: PromiseResult<
     { DistributionConfig?: DistributionConfig; ETag?: string },
     AWS.AWSError
@@ -50,5 +64,5 @@ function parseDistributionResult(
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return { config: result.DistributionConfig!, eTag: result.ETag! };
+  return { id, config: result.DistributionConfig!, eTag: result.ETag! };
 }
