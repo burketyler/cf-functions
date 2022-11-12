@@ -1,8 +1,8 @@
 import AWS from "aws-sdk";
-import { FunctionSummary } from "aws-sdk/clients/cloudfront.js";
+import { FunctionSummary, TestResult } from "aws-sdk/clients/cloudfront.js";
 import { PromiseResult } from "aws-sdk/lib/request.js";
 
-import { executeAwsRequest } from "../utils.js";
+import { executeAwsRequest } from "../../utils.js";
 
 import { DEFAULT_DESCR, DEFAULT_RUNTIME } from "./constants.js";
 import { FunctionInputs, FunctionResult, FunctionStage } from "./types.js";
@@ -98,18 +98,51 @@ export async function deleteFunction(
 
 export async function publishFunction(
   name: string,
-  etag: string
+  eTag: string
 ): Promise<FunctionResult> {
   const result = await executeAwsRequest(
     cf
       .publishFunction({
         Name: name,
-        IfMatch: etag,
+        IfMatch: eTag,
       })
       .promise()
   );
 
   return parseFunctionResult({ ...result, ETag: "N/A" });
+}
+
+export async function testFunction(inputs: {
+  name: string;
+  stage: FunctionStage;
+  eTag: string;
+  eventObject: string;
+}): Promise<TestResult> {
+  const {
+    name: Name,
+    stage: Stage,
+    eTag: IfMatch,
+    eventObject: EventObject,
+  } = inputs;
+
+  const result = await executeAwsRequest(
+    cf
+      .testFunction({
+        Name,
+        EventObject,
+        Stage,
+        IfMatch,
+      })
+      .promise()
+  );
+
+  if (!result.TestResult) {
+    throw new Error(
+      `CloudFront didn't return a 'TestResult' for function '${Name}'.`
+    );
+  }
+
+  return result.TestResult;
 }
 
 function parseFunctionResult(

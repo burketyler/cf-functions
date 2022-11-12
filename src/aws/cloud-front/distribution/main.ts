@@ -2,11 +2,21 @@ import AWS from "aws-sdk";
 import { DistributionConfig } from "aws-sdk/clients/cloudfront.js";
 import { PromiseResult } from "aws-sdk/lib/request.js";
 
-import { executeAwsRequest } from "../utils.js";
+import { executeAwsRequest } from "../../utils.js";
 
 import { DistributionResult } from "./types.js";
 
 const cf = new AWS.CloudFront();
+
+export async function fetchDistribution(
+  id: string
+): Promise<DistributionResult> {
+  const result = await executeAwsRequest(
+    cf.getDistributionConfig({ Id: id }).promise()
+  );
+
+  return parseDistributionResult(id, result);
+}
 
 export async function fetchDistributionStatus(id: string): Promise<string> {
   const result = await executeAwsRequest(
@@ -18,16 +28,6 @@ export async function fetchDistributionStatus(id: string): Promise<string> {
   }
 
   return result.Distribution.Status;
-}
-
-export async function fetchDistribution(
-  id: string
-): Promise<DistributionResult> {
-  const result = await executeAwsRequest(
-    cf.getDistributionConfig({ Id: id }).promise()
-  );
-
-  return parseDistributionResult(id, result);
 }
 
 export async function updateDistribution(

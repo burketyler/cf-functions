@@ -35,14 +35,14 @@ const handler = async (args: StageArgs) => {
 
   logger.info("Starting command 'stage'.");
 
-  const { fnInputs, deployedFns } = await getFunctionManifest(
+  const { functionInputs, deployedFns } = await getFunctionManifest(
     args.config,
     stage
   );
 
-  logger.info(`Staging ${fnInputs.length} functions in ${stage}:\n`);
+  logger.info(`Staging ${functionInputs.length} functions in ${stage}:\n`);
 
-  const resultsPromise = fnInputs.map(async (functionInputs) => {
+  const resultsPromise = functionInputs.map(async (functionInputs) => {
     const progress = ora({
       indent: 2,
       text: `Deploying ${functionInputs.name}`,

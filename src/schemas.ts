@@ -17,6 +17,7 @@ const fnSchema = Joi.object().pattern(
   Joi.string().required(),
   Joi.object({
     handler: Joi.string().required(),
+    test: Joi.string().required(),
     runtime: runtimeSchema,
     associations: Joi.array().items(associationSchema).required(),
     isEnabled: Joi.boolean().optional(),

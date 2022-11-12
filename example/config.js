@@ -1,8 +1,9 @@
-module.exports = {
+export default {
   defaultRuntime: "cloudfront-js-1.0",
   functions: {
     RewritePath: {
-      handler: "./example/function.js",
+      handler: "./example/function/index.js",
+      test: "./example/function/test.js",
       description: "This is a test function",
       associations: [
         {

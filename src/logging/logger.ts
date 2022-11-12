@@ -42,11 +42,21 @@ function fatal(...messages: string[]) {
     .log();
 }
 
-function error(msg: string, error?: Error) {
-  console.log(chalk.red(msg));
-  console.log(" " + chalk.red(error?.name));
-  console.log("  " + chalk.red(error?.message));
-  console.log("   " + chalk.red(error?.stack));
+function error(message: string, error?: Error) {
+  const builder = new LogBuilder({
+    message,
+    color: "red",
+  });
+
+  if (error) {
+    builder.setIndent(1).line(error.name).setIndent(2).line(error.message);
+
+    if (error.stack) {
+      builder.setIndent(3).line(error.stack);
+    }
+  }
+
+  builder.log();
 }
 
 function info(msg: string) {

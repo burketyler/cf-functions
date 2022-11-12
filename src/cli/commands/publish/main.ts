@@ -7,7 +7,7 @@ import {
   publishFunction,
 } from "../../../aws/index.js";
 import { logger } from "../../../logging/index.js";
-import { DEFAULT_ARGS } from "../../constants.js";
+import { DEFAULT_ARGS } from "../../consts.js";
 import { FunctionResultError } from "../../types.js";
 import {
   findFunction,
@@ -29,16 +29,16 @@ const builder: CommandBuilder = {
 const handler = async (args: PublishArgs) => {
   logger.info("Starting command 'publish'.");
 
-  const { fnInputs, deployedFns } = await getFunctionManifest(
+  const { functionInputs, deployedFns } = await getFunctionManifest(
     args.config,
     FunctionStage.DEVELOPMENT
   );
 
   logger.info(
-    `Publishing ${fnInputs.length} functions from ${FunctionStage.DEVELOPMENT} to ${FunctionStage.LIVE}:\n`
+    `Publishing ${functionInputs.length} functions from ${FunctionStage.DEVELOPMENT} to ${FunctionStage.LIVE}:\n`
   );
 
-  const resultsPromise = fnInputs.map(async (fn) => {
+  const resultsPromise = functionInputs.map(async (fn) => {
     const progress = ora({
       indent: 2,
       text: `Publishing ${fn.name}`,

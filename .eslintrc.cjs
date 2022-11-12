@@ -2,6 +2,7 @@
 module.exports = {
   env: {
     node: true,
+    jest: true
   },
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint", "prettier", "import"],
