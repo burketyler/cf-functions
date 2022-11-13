@@ -1,0 +1,11 @@
+name: Push
+description: Perform branch push actions
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml

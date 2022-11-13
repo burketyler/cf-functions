@@ -12,7 +12,6 @@ import { logger } from "../../../logging/index.js";
 import { FunctionResultError } from "../../types.js";
 import {
   createFunctionManifest,
-  findFunction,
   settleAndPrintFunctionResults,
 } from "../../utils.js";
 

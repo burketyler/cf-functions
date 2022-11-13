@@ -2,6 +2,7 @@ import AWS from "aws-sdk";
 import { DistributionConfig } from "aws-sdk/clients/cloudfront.js";
 import { PromiseResult } from "aws-sdk/lib/request.js";
 
+import { logger } from "../../../logging/index.js";
 import { executeAwsRequest } from "../../utils.js";
 
 import { DistributionResult } from "./types.js";
@@ -24,7 +25,8 @@ export async function fetchDistributionStatus(id: string): Promise<string> {
   );
 
   if (!result.Distribution?.Status) {
-    throw new Error(`Status not returned while fetching distribution ${id}.`);
+    logger.fatal(`Status not returned while fetching distribution ${id}.`);
+    process.exit(1);
   }
 
   return result.Distribution.Status;
@@ -58,9 +60,10 @@ function parseDistributionResult(
   }
 
   if (missingFields?.[0]) {
-    throw new Error(
+    logger.fatal(
       `Expected fields ${missingFields.join(", ")} not returned by CloudFront.`
     );
+    process.exit(1);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

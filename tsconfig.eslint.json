@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "index.ts",
+    "src",
+    "tests",
+    ".eslintrc.cjs",
+    "commitlint.config.cjs",
+    "release.config.js",
+    "jest.config.ts"
+  ]
+}

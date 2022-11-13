@@ -1,10 +1,14 @@
-// eslint-disable-next-line no-undef
 module.exports = {
+  root: true,
   env: {
     node: true,
     jest: true
   },
+  ignorePatterns: ["example"],
   parser: "@typescript-eslint/parser",
+  parserOptions: {
+    "project": "./tsconfig.eslint.json"
+  },
   plugins: ["@typescript-eslint", "prettier", "import"],
   extends: [
     "eslint:recommended",
@@ -35,5 +39,4 @@ module.exports = {
       },
     ],
   },
-  root: true,
 };

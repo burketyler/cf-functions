@@ -2,6 +2,7 @@ import AWS from "aws-sdk";
 import { FunctionSummary, TestResult } from "aws-sdk/clients/cloudfront.js";
 import { PromiseResult } from "aws-sdk/lib/request.js";
 
+import { logger } from "../../../logging/index.js";
 import { executeAwsRequest } from "../../utils.js";
 
 import { DEFAULT_DESCR, DEFAULT_RUNTIME } from "./constants.js";
@@ -137,9 +138,10 @@ export async function testFunction(inputs: {
   );
 
   if (!result.TestResult) {
-    throw new Error(
+    logger.fatal(
       `CloudFront didn't return a 'TestResult' for function '${Name}'.`
     );
+    process.exit(1);
   }
 
   return result.TestResult;
@@ -160,9 +162,10 @@ function parseFunctionResult(
   }
 
   if (missingFields?.[0]) {
-    throw new Error(
+    logger.fatal(
       `Expected fields ${missingFields.join(", ")} not returned by CloudFront.`
     );
+    process.exit(1);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

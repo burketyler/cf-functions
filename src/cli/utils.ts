@@ -47,7 +47,6 @@ export async function parseConfigFile(path: string): Promise<Config> {
       `File: '${path}'`,
       "Is it exported as 'default'?"
     );
-    process.exit(1);
   }
 
   const { error } = configSchema.validate(config, {
@@ -61,7 +60,6 @@ export async function parseConfigFile(path: string): Promise<Config> {
       `File: '${path}'`,
       ...error.details.map(({ message }, index) => `${index + 1}. ${message}`)
     );
-    process.exit(1);
   }
 
   return config;
@@ -83,13 +81,14 @@ function assertFileExists(path: string, errorMessage: string): void {
 }
 
 export function findFunction(name: string, list: FunctionSummary[]) {
-  const fn = list.find((depFn) => depFn.Name === name);
+  const _function = list.find((depFn) => depFn.Name === name);
 
-  if (!fn) {
-    throw new Error(`Function ${name} not found in AWS.`);
+  if (!_function) {
+    logger.fatal(`Function ${name} not found in AWS.`);
+    process.exit(1);
   }
 
-  return fn;
+  return _function;
 }
 
 export async function settlePromises<SuccessType, RejectType>(
@@ -306,9 +305,10 @@ function assertFunctionDistributionCompatibility(
       if (
         !doesBehaviourExist(behaviourPattern, distributionMap[distributionId])
       ) {
-        throw new Error(
+        logger.fatal(
           `Distribution '${distributionId}' has no cache behaviour matching pattern '${behaviourPattern}'. Unable to associate function '${functionName}'.`
         );
+        process.exit(1);
       }
     });
   }

@@ -1,4 +1,3 @@
-import { FunctionEventObject } from "aws-sdk/clients/cloudfront.js";
 import { CommandBuilder } from "yargs";
 
 export const DEFAULT_ARGS: CommandBuilder = {
