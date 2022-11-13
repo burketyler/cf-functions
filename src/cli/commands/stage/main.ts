@@ -11,7 +11,8 @@ import {
 import { logger } from "../../../logging/index.js";
 import { FunctionResultError } from "../../types.js";
 import {
-  getFunctionManifest,
+  createFunctionManifest,
+  findFunction,
   settleAndPrintFunctionResults,
 } from "../../utils.js";
 
@@ -35,7 +36,7 @@ const handler = async (args: StageArgs) => {
 
   logger.info("Starting command 'stage'.");
 
-  const { functionInputs, deployedFns } = await getFunctionManifest(
+  const { functionInputs, deployedFunctions } = await createFunctionManifest(
     args.config,
     stage
   );
@@ -51,8 +52,8 @@ const handler = async (args: StageArgs) => {
     try {
       let result: FunctionResult;
 
-      const liveFn = deployedFns.find(
-        (depFn) => depFn.Name === functionInputs.name
+      const liveFn = deployedFunctions.find(
+        (df) => df.Name === functionInputs.name
       );
 
       if (liveFn) {

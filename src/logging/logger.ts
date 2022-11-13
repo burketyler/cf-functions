@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { write } from "fs";
 
 import { FunctionConfig } from "../types.js";
 
@@ -9,6 +8,7 @@ export function createLogger() {
   return {
     log,
     info,
+    warn,
     error,
     fatal,
     printFunctionConfigList,
@@ -61,6 +61,10 @@ function error(message: string, error?: Error) {
 
 function info(msg: string) {
   console.log(chalk.yellow(msg));
+}
+
+function warn(msg: string) {
+  console.log(chalk.yellowBright(msg));
 }
 
 function printFunctionConfigList(functionConfigMap: {

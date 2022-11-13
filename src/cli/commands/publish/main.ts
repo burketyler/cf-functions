@@ -11,7 +11,7 @@ import { DEFAULT_ARGS } from "../../consts.js";
 import { FunctionResultError } from "../../types.js";
 import {
   findFunction,
-  getFunctionManifest,
+  createFunctionManifest,
   settleAndPrintFunctionResults,
 } from "../../utils.js";
 
@@ -29,7 +29,7 @@ const builder: CommandBuilder = {
 const handler = async (args: PublishArgs) => {
   logger.info("Starting command 'publish'.");
 
-  const { functionInputs, deployedFns } = await getFunctionManifest(
+  const { functionInputs, deployedFunctions } = await createFunctionManifest(
     args.config,
     FunctionStage.DEVELOPMENT
   );
@@ -45,7 +45,7 @@ const handler = async (args: PublishArgs) => {
     }).start();
 
     try {
-      const deployedFn = findFunction(fn.name, deployedFns);
+      const deployedFn = findFunction(fn.name, deployedFunctions);
 
       const { eTag } = await describeFunction(
         fn.name,
