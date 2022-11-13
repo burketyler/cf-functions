@@ -1,5 +1,4 @@
 name: Build
-description: Builds the project
 
 on:
   workflow_call:
