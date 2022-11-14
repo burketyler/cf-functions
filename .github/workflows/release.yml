@@ -6,10 +6,8 @@ on:
       - master
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
   release:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/build.yml
     steps:
       - name: Release
         env:
