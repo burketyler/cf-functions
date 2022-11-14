@@ -1,20 +1,16 @@
 name: Build
 
-on:
-  workflow_call:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14.x
-          cache: "yarn"
-      - name: Install
-        run: yarn install --frozen-lockfile
-      - name: Lint
-        run: yarn lint:check && yarn prettier:check
-      - name: Build
-        run: yarn build
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14.x
+        cache: "yarn"
+    - name: Install
+      run: yarn install --frozen-lockfile
+    - name: Lint
+      run: yarn lint:check && yarn prettier:check
+    - name: Build
+      run: yarn build
