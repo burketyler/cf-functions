@@ -7,8 +7,9 @@ on:
 
 jobs:
   release:
-    uses: ./.github/workflows/build.yml
     steps:
+      - name: Build
+        uses: ./.github/workflows/build.yml
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

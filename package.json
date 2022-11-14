@@ -76,6 +76,7 @@
     "*.mts": "eslint --fix",
     "*.mjs": "eslint --fix",
     "*.json": "prettier --write",
-    "*.md": "prettier --write"
+    "*.md": "prettier --write",
+    "*.yml": "prettier --write"
   }
 }
