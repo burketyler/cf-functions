@@ -1,5 +1,4 @@
-name: Push
-description: Perform branch push actions
+name: OnPush
 
 on:
   push:
