@@ -10,7 +10,10 @@ runs:
         cache: "yarn"
     - name: Install
       run: yarn install --frozen-lockfile
+      shell: bash
     - name: Lint
       run: yarn lint:check && yarn prettier:check
+      shell: bash
     - name: Build
       run: yarn build
+      shell: bash
