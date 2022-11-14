@@ -6,7 +6,7 @@
     "tests",
     ".eslintrc.cjs",
     "commitlint.config.cjs",
-    "release.config.js",
+    "release.config.cjs",
     "jest.config.ts"
   ]
 }
