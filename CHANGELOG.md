@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/burketyler/cf-functions/compare/v1.0.0...v1.0.1) (2022-11-15)
+
+### Bug Fixes
+
+- parsing issues, add environment dotenv compatibility ([eab711a](https://github.com/burketyler/cf-functions/commit/eab711a222dbab71d835e24a5a863aeb19d0bf25))
+
 # 1.0.0 (2022-11-14)
 
 ### Features
