@@ -25,6 +25,7 @@ import {
   findBehaviour,
   haveAssociationsChanged,
   parseConfigFile,
+  parseEnvFile,
   pollDistributionsForDeployedStatus,
   settlePromises,
 } from "../../utils.js";
@@ -41,6 +42,8 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: AssociateArgs) => {
+  parseEnvFile(args.env);
+
   logger.info("Starting command 'associate'.");
 
   const [config, deployedFunctions] = await Promise.all([

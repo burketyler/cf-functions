@@ -8,6 +8,7 @@ import { BehaviourPattern } from "../types.js";
 
 export interface DefaultArgs {
   config: string;
+  env?: string;
 }
 
 export interface FunctionResultError {
@@ -41,8 +42,4 @@ export interface AssociateResult {
 export interface AssociateResultError {
   distribution: DistributionResult;
   error: Error;
-}
-
-export interface StatusPollResult {
-  distribution: DistributionResult;
 }

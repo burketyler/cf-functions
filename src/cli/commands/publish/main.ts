@@ -13,6 +13,7 @@ import {
   findFunction,
   createFunctionManifest,
   settleAndPrintFunctionResults,
+  parseEnvFile,
 } from "../../utils.js";
 
 import { PublishArgs } from "./types.js";
@@ -27,6 +28,8 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: PublishArgs) => {
+  parseEnvFile(args.env);
+
   logger.info("Starting command 'publish'.");
 
   const { functionInputs, deployedFunctions } = await createFunctionManifest(

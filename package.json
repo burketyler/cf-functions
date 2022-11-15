@@ -31,7 +31,7 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
     "clean": "rm -rf .build",
-    "build": "yarn clean && tsc",
+    "build": "yarn clean && tsc && chmod +x .build/src/cli/index.js",
     "cli": "ts-node-esm src/cli/index.ts"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "aws-sdk": "2.1248.0",
     "chalk": "5.1.2",
     "clone-deep": "4.0.1",
+    "dotenv": "16.0.3",
     "joi": "17.7.0",
     "ora": "6.1.2",
     "uuid": "9.0.0",

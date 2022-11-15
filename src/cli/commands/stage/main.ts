@@ -12,6 +12,7 @@ import { logger } from "../../../logging/index.js";
 import { FunctionResultError } from "../../types.js";
 import {
   createFunctionManifest,
+  parseEnvFile,
   settleAndPrintFunctionResults,
 } from "../../utils.js";
 
@@ -31,6 +32,8 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: StageArgs) => {
+  parseEnvFile(args.env);
+
   const stage = FunctionStage.DEVELOPMENT;
 
   logger.info("Starting command 'stage'.");

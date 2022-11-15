@@ -5,6 +5,7 @@ import {
   FunctionAssociations,
   FunctionSummary,
 } from "aws-sdk/clients/cloudfront.js";
+import dotenv from "dotenv";
 import { existsSync, readFileSync } from "fs";
 import ora from "ora";
 import { join } from "path";
@@ -29,6 +30,37 @@ import {
   FunctionManifest,
   FunctionResultError,
 } from "./types.js";
+
+export function parseEnvFile(env: string | undefined): void {
+  let envPath = join(process.cwd(), ".env");
+
+  if (env) {
+    envPath += `.${env}`;
+  }
+
+  if (!existsSync(envPath)) {
+    if (env) {
+      logger.fatal("Failed to load environment file.", `File: ${envPath}`);
+      process.exit(1);
+    } else {
+      return;
+    }
+  }
+
+  const result = dotenv.config({
+    path: envPath,
+  });
+
+  if (result.error) {
+    logger.fatal(
+      "Error while loading environment file.",
+      result.error.name,
+      result.error.message,
+      result.error.stack ?? ""
+    );
+    process.exit(1);
+  }
+}
 
 export function sleep(timeoutMs: number): Promise<void> {
   return new Promise((r) => setTimeout(r, timeoutMs));
@@ -65,13 +97,18 @@ export async function parseConfigFile(path: string): Promise<Config> {
   return config;
 }
 
-export function parseHandlerCode(path: string): string {
-  assertFileExists(path, "Failed to locate function handler.");
+export function parseHandlerCode(
+  prefixPath: string | undefined,
+  path: string
+): string {
+  const handlerPath = join(process.cwd(), prefixPath ?? "", path);
 
-  return readFileSync(path, "utf-8");
+  assertFileExists(handlerPath, "Failed to locate function handler.");
+
+  return readFileSync(handlerPath, "utf-8");
 }
 
-function assertFileExists(path: string, errorMessage: string): void {
+export function assertFileExists(path: string, errorMessage: string): void {
   const fileExists = existsSync(path);
 
   if (!fileExists) {
@@ -114,18 +151,18 @@ export async function createFunctionManifest(
   configPath: string,
   stage: FunctionStage
 ): Promise<FunctionManifest> {
-  const [config, deployedFns] = await Promise.all([
+  const [config, deployedFunctions] = await Promise.all([
     parseConfigFile(join(process.cwd(), configPath)),
     listFunctions(stage),
   ]);
 
   logger.printFunctionConfigList(config.functions);
 
-  const configFns: FunctionInputs[] = Object.entries(config.functions).map(
+  const functionInputs: FunctionInputs[] = Object.entries(config.functions).map(
     ([name, { runtime, description, handler }]) => ({
       name,
       description,
-      code: parseHandlerCode(handler),
+      code: parseHandlerCode(config.pathPrefix, handler),
       runtime: runtime ?? config.defaultRuntime,
     })
   );
@@ -133,8 +170,8 @@ export async function createFunctionManifest(
   logger.info("Configurations loaded.");
 
   return {
-    functionInputs: configFns,
-    deployedFunctions: deployedFns,
+    functionInputs,
+    deployedFunctions,
   };
 }
 

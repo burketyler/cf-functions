@@ -16,9 +16,14 @@ import { LogBuilder } from "../../../logging/builder.js";
 import { logger } from "../../../logging/index.js";
 import { LogListItem } from "../../../logging/types.js";
 import { isAsymmetricMatch } from "../../../matchers/is-asymmetric-match.js";
-import { FunctionConfig, FunctionConfigMap } from "../../../types.js";
+import { Config, FunctionConfig } from "../../../types.js";
 import { DEFAULT_ARGS } from "../../consts.js";
-import { parseConfigFile, settlePromises } from "../../utils.js";
+import {
+  assertFileExists,
+  parseConfigFile,
+  parseEnvFile,
+  settlePromises,
+} from "../../utils.js";
 
 import { DEFAULT_EVENT_OBJECT } from "./consts.js";
 import {
@@ -48,28 +53,46 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: TestArgs) => {
+  parseEnvFile(args.env);
+
   logger.info("Starting command 'test'.\n");
 
   const config = await parseConfigFile(join(process.cwd(), args.config));
 
   logger.info(`Running test suite for stage '${args.stage}'.\n`);
 
-  const testPromises = runTests(config.functions, args.stage);
+  const testPromises = runTests(config, args.stage);
 
   await settleAndPrintTestResults(testPromises);
 
   logger.info("Finishing command 'test'.");
 };
 
-async function parseTestData(path: string): Promise<TestCase[]> {
-  return (await import(join(process.cwd(), path))).default;
+async function parseTestData(
+  functionName: string,
+  functionConfig: FunctionConfig,
+  pathPrefix: string | undefined
+): Promise<TestCase[]> {
+  if (!functionConfig.test) {
+    logger.fatal(`Test file for function '${functionName}' is undefined.`);
+    process.exit(1);
+  }
+
+  const testPath = join(process.cwd(), pathPrefix ?? "", functionConfig.test);
+
+  assertFileExists(
+    testPath,
+    `Failed to locate test file for function '${functionName}'.`
+  );
+
+  return (await import(testPath)).default;
 }
 
 function runTests(
-  functions: FunctionConfigMap,
+  config: Config,
   stage: FunctionStage
 ): Promise<TestCaseResult[]>[] {
-  return Object.entries(functions).map(
+  return Object.entries(config.functions).map(
     async ([functionName, functionConfig]) => {
       const results: TestCaseResult[] = [];
 
@@ -80,7 +103,7 @@ function runTests(
 
       try {
         const [testCases, deployedFunction] = await Promise.all([
-          parseTestData(functionConfig.test),
+          parseTestData(functionName, functionConfig, config.pathPrefix),
           describeFunction(functionName, stage),
         ]);
 
