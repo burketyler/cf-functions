@@ -68,13 +68,12 @@ export type ResponseCookie = {
 };
 
 export type HandlerReturn =
-  | (FunctionEventRequest & {
+  | (Omit<FunctionEventRequest, "querystring" | "headers" | "cookies"> & {
       querystring?: MultiValueMap;
       headers?: MultiValueMap;
       cookies?: MultiValueMap;
     })
-  | (FunctionEventResponse & {
-      statusDescription?: string;
+  | (Omit<FunctionEventResponse, "headers" | "cookies"> & {
       headers?: ResponseHeader;
       cookies?: ResponseCookie;
     });
