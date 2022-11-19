@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/burketyler/cf-functions/compare/v1.1.0...v1.1.1) (2022-11-19)
+
+### Bug Fixes
+
+- handler return types ([8ff7a78](https://github.com/burketyler/cf-functions/commit/8ff7a784b9fec99bd23000e26ecb7fd78333c8ad))
+
 # [1.1.0](https://github.com/burketyler/cf-functions/compare/v1.0.1...v1.1.0) (2022-11-19)
 
 ### Features
