@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/burketyler/cf-functions/compare/v1.0.1...v1.1.0) (2022-11-19)
+
+### Features
+
+- add typescript support ([127358a](https://github.com/burketyler/cf-functions/commit/127358ac074a7219227b04b3842643146c78f483))
+
 ## [1.0.1](https://github.com/burketyler/cf-functions/compare/v1.0.0...v1.0.1) (2022-11-15)
 
 ### Bug Fixes
