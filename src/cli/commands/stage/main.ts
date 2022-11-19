@@ -9,10 +9,10 @@ import {
   updateFunction,
 } from "../../../aws/index.js";
 import { logger } from "../../../logging/index.js";
+import { DEFAULT_ARGS } from "../../consts.js";
 import { FunctionResultError } from "../../types.js";
 import {
   createFunctionManifest,
-  parseEnvFile,
   settleAndPrintFunctionResults,
 } from "../../utils.js";
 
@@ -23,17 +23,10 @@ const command = "stage";
 const desc = "Deploy functions to the 'DEVELOPMENT' stage.";
 
 const builder: CommandBuilder = {
-  c: {
-    alias: "config",
-    default: "./cf-functions.js",
-    describe: "Path to the cf-functions configuration file.",
-    type: "string",
-  },
+  ...DEFAULT_ARGS,
 };
 
 const handler = async (args: StageArgs) => {
-  parseEnvFile(args.env);
-
   const stage = FunctionStage.DEVELOPMENT;
 
   logger.info("Starting command 'stage'.");

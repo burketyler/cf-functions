@@ -1,7 +1,16 @@
 import { TestResult } from "aws-sdk/clients/cloudfront.js";
 
-import { FunctionStage } from "../../../aws/index.js";
+import {
+  FunctionEvent,
+  FunctionEventRequest,
+  FunctionEventResponse,
+  FunctionStage,
+} from "../../../aws/index.js";
 import { DefaultArgs } from "../../types.js";
+
+export interface TestArgs extends DefaultArgs {
+  stage: FunctionStage;
+}
 
 export interface TestResultMap {
   [functionName: string]: TestCaseResult[];
@@ -17,14 +26,10 @@ export interface TestError {
   error: Error;
 }
 
-export interface TestArgs extends DefaultArgs {
-  stage: FunctionStage;
-}
-
 export type TestCase = {
   name: string;
   given: ViewerRequestTestObject | ViewerResponseTestObject;
-  expect: EventObject;
+  expect: FunctionEvent;
 };
 
 type DeepPartial<T> = T extends object
@@ -33,66 +38,20 @@ type DeepPartial<T> = T extends object
     }
   : T;
 
-export interface ViewerRequestTestObject extends DeepPartial<EventObject> {
-  request: Partial<Request> & {
+export interface ViewerRequestTestObject extends DeepPartial<FunctionEvent> {
+  request: Partial<FunctionEventRequest> & {
     method: string;
     uri: string;
   };
 }
 
-export interface ViewerResponseTestObject extends DeepPartial<EventObject> {
-  request: Partial<Request> & {
+export interface ViewerResponseTestObject extends DeepPartial<FunctionEvent> {
+  request: Partial<FunctionEventRequest> & {
     method: string;
     uri: string;
   };
-  response: Partial<Response> & {
+  response: Partial<FunctionEventResponse> & {
     statusCode: number;
     statusDescription: string;
   };
 }
-
-export interface EventObject {
-  version: string;
-  context: {
-    distributionDomainName: string;
-    distributionId: string;
-    eventType: string;
-    requestId: string;
-  };
-  viewer: {
-    ip: string;
-  };
-  request: Request;
-  response?: Response;
-}
-
-interface Request {
-  method: string;
-  uri: string;
-  querystring: MultiValueMap;
-  headers: MultiValueMap;
-  cookies: MultiValueMap;
-}
-
-type MultiValueMap = {
-  [name: string]: { value: string; multiValue?: { value: string }[] };
-};
-
-interface Response {
-  statusCode: number;
-  statusDescription: string;
-  headers: ResponseHeader;
-  cookies: ResponseCookie;
-}
-
-type ResponseHeader = {
-  [headerName: string]: { value: string };
-};
-
-type ResponseCookie = {
-  [cookieName: string]: {
-    value: string;
-    attributes: string;
-    multiValue?: { value: string; attributes: string }[];
-  };
-};

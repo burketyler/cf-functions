@@ -8,6 +8,7 @@ import { CommandBuilder, CommandModule } from "yargs";
 import {
   describeFunction,
   DistributionEventType,
+  FunctionEvent,
   FunctionResult,
   FunctionStage,
   testFunction,
@@ -21,13 +22,11 @@ import { DEFAULT_ARGS } from "../../consts.js";
 import {
   assertFileExists,
   parseConfigFile,
-  parseEnvFile,
   settlePromises,
 } from "../../utils.js";
 
 import { DEFAULT_EVENT_OBJECT } from "./consts.js";
 import {
-  EventObject,
   TestArgs,
   TestCase,
   TestCaseResult,
@@ -53,11 +52,9 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: TestArgs) => {
-  parseEnvFile(args.env);
-
   logger.info("Starting command 'test'.\n");
 
-  const config = await parseConfigFile(join(process.cwd(), args.config));
+  const config = await parseConfigFile(args.config);
 
   logger.info(`Running test suite for stage '${args.stage}'.\n`);
 
@@ -202,14 +199,14 @@ function mergeEventObject(
       distributionDomainName: `${distributionId}.cloudfront.net`,
       requestId: `test-${v4()}`,
     },
-  } as EventObject;
+  } as FunctionEvent;
 
   return JSON.stringify(mergedObject);
 }
 
 function assertExpectedOutput(
   result: TestResult,
-  expected: EventObject
+  expected: FunctionEvent
 ): boolean {
   return (
     !result.FunctionErrorMessage &&

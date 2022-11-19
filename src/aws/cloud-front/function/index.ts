@@ -9,4 +9,14 @@ export {
 } from "./main.js";
 export { FunctionRuntime, FunctionStage } from "./types.js";
 
-export type { FunctionInputs, FunctionResult } from "./types.js";
+export type {
+  FunctionInputs,
+  FunctionResult,
+  FunctionEvent,
+  FunctionEventRequest,
+  FunctionEventResponse,
+  ResponseHeader,
+  ResponseCookie,
+  HandlerReturn,
+  MultiValueMap,
+} from "./types.js";

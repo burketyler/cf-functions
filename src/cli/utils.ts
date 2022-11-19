@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import { existsSync, readFileSync } from "fs";
 import ora from "ora";
 import { join } from "path";
+import { CommandModule } from "yargs";
 
 import {
   CloudFrontError,
@@ -20,6 +21,7 @@ import {
   FunctionStage,
   listFunctions,
 } from "../aws/index.js";
+import { tsService } from "../compiler/index.js";
 import { LogBuilder } from "../logging/builder.js";
 import { logger } from "../logging/index.js";
 import { configSchema } from "../schemas.js";
@@ -31,7 +33,20 @@ import {
   FunctionResultError,
 } from "./types.js";
 
-export function parseEnvFile(env: string | undefined): void {
+export function createCommand<U, T>(
+  command: CommandModule<U, T>
+): CommandModule<U, T> {
+  return {
+    ...command,
+    handler: (args) => {
+      parseEnvFile(args.env as string | undefined);
+
+      command.handler(args);
+    },
+  };
+}
+
+function parseEnvFile(env: string | undefined): void {
   let envPath = join(process.cwd(), ".env");
 
   if (env) {
@@ -66,17 +81,40 @@ export function sleep(timeoutMs: number): Promise<void> {
   return new Promise((r) => setTimeout(r, timeoutMs));
 }
 
-export async function parseConfigFile(path: string): Promise<Config> {
+export async function parseConfigFile(
+  path: string | undefined
+): Promise<Config> {
   logger.info("Loading function configuration.");
 
-  assertFileExists(path, "Failed to locate configuration.");
+  const defaultPath = join(process.cwd(), "cf-functions");
+  const defaultTsPath = `${defaultPath}.ts`;
+  const defaultJsPath = `${defaultPath}.js`;
 
-  const config: Config = (await import(path))?.default;
+  let configPath: string;
+
+  if (path) {
+    configPath = join(process.cwd(), path);
+  } else if (existsSync(defaultTsPath)) {
+    configPath = defaultTsPath;
+  } else if (existsSync(defaultJsPath)) {
+    configPath = defaultJsPath;
+  } else {
+    logger.fatal(
+      "Failed to locate configuration file. Checked paths:",
+      `File: ${defaultTsPath}`,
+      `File: ${defaultJsPath}`
+    );
+    process.exit(1);
+  }
+
+  assertFileExists(configPath, "Failed to locate configuration file.");
+
+  const config: Config = (await import(configPath))?.default;
 
   if (!config || typeof config !== "object" || !config.functions) {
     logger.fatal(
       "Failed to import from config.",
-      `File: '${path}'`,
+      `File: '${configPath}'`,
       "Is it exported as 'default'?"
     );
   }
@@ -105,14 +143,32 @@ export function parseHandlerCode(
 
   assertFileExists(handlerPath, "Failed to locate function handler.");
 
-  return readFileSync(handlerPath, "utf-8");
+  let code = readFileSync(handlerPath, "utf8");
+
+  if (handlerPath.endsWith(".ts")) {
+    code = tsService.compile(code, handlerPath);
+    code = code.replace(/(\/\/#\ssourceMappingURL=.*|export\s{.*};)/, "");
+
+    const imports = code.match(/import\s.*".*"/g);
+
+    if (imports) {
+      logger.fatal(
+        "Handler code includes forbidden import statement.",
+        `File: ${handlerPath}.`,
+        ...imports
+      );
+      process.exit(1);
+    }
+  }
+
+  return code;
 }
 
-export function assertFileExists(path: string, errorMessage: string): void {
+export function assertFileExists(path: string, errorMessage?: string): void {
   const fileExists = existsSync(path);
 
   if (!fileExists) {
-    logger.fatal(errorMessage, `File: '${path}'`);
+    logger.fatal(errorMessage ?? "File doesn't exist.", `File: '${path}'`);
     process.exit(1);
   }
 }
@@ -148,11 +204,11 @@ export async function settlePromises<SuccessType, RejectType>(
 }
 
 export async function createFunctionManifest(
-  configPath: string,
+  configPath: string | undefined,
   stage: FunctionStage
 ): Promise<FunctionManifest> {
   const [config, deployedFunctions] = await Promise.all([
-    parseConfigFile(join(process.cwd(), configPath)),
+    parseConfigFile(configPath),
     listFunctions(stage),
   ]);
 
@@ -209,7 +265,7 @@ export function printFunctionResultList(
         children: [
           {
             bullet: "->",
-            message: `${summary.FunctionMetadata.FunctionARN} [${summary.FunctionMetadata.Stage}] [${eTag}]`,
+            message: `${summary.FunctionMetadata.FunctionARN} [Stage: ${summary.FunctionMetadata.Stage}] [ETag: ${eTag}]`,
             color: "greenBright",
           },
         ],

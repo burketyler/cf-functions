@@ -1,6 +1,6 @@
-import { EventObject } from "./types.js";
+import { FunctionEvent } from "../../../aws/index.js";
 
-export const DEFAULT_EVENT_OBJECT: EventObject = {
+export const DEFAULT_EVENT_OBJECT: FunctionEvent = {
   version: "1.0",
   context: {
     distributionDomainName: "",

@@ -5,7 +5,6 @@ import {
 } from "aws-sdk/clients/cloudfront.js";
 import cloneDeep from "clone-deep";
 import ora, { Ora } from "ora";
-import { join } from "path";
 import { CommandBuilder, CommandModule } from "yargs";
 
 import {
@@ -33,7 +32,6 @@ import {
   findBehaviour,
   haveAssociationsChanged,
   parseConfigFile,
-  parseEnvFile,
   pollDistributionsForDeployedStatus,
   settlePromises,
 } from "../../utils.js";
@@ -50,12 +48,10 @@ const builder: CommandBuilder = {
 };
 
 const handler = async (args: DestroyArgs) => {
-  parseEnvFile(args.env);
-
   logger.info("Starting command 'destroy'.");
 
   const [config, liveFunctions] = await Promise.all([
-    parseConfigFile(join(process.cwd(), args.config)),
+    parseConfigFile(args.config),
     listFunctions(FunctionStage.LIVE),
   ]);
 

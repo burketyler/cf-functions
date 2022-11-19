@@ -7,7 +7,7 @@ import {
 import { BehaviourPattern } from "../types.js";
 
 export interface DefaultArgs {
-  config: string;
+  config?: string;
   env?: string;
 }
 

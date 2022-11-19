@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node-esm
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -7,11 +7,13 @@ import { destroy } from "./commands/destroy/index.js";
 import { publish } from "./commands/publish/index.js";
 import { stage } from "./commands/stage/index.js";
 import { test } from "./commands/test/index.js";
+import { createCommand } from "./utils.js";
 
-yargs(hideBin(process.argv))
-  .command(stage)
-  .command(publish)
-  .command(associate)
-  .command(test)
-  .command(destroy)
-  .showHelpOnFail(false, "Specify --help for available options").argv;
+const instance = yargs(hideBin(process.argv));
+
+[stage, publish, associate, test, destroy].forEach((cmd) =>
+  //TODO: fix this
+  instance.command(createCommand(cmd as any))
+);
+
+instance.showHelpOnFail(false, "Specify --help for available options").argv;

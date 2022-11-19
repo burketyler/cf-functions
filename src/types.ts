@@ -15,7 +15,7 @@ export interface FunctionConfigMap {
 export interface FunctionConfig {
   handler: string;
   test?: string;
-  runtime: FunctionRuntime;
+  runtime?: FunctionRuntime;
   associations: FunctionAssociationConfig[];
   isEnabled?: boolean;
   description?: string;
