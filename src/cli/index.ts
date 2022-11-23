@@ -12,8 +12,7 @@ import { createCommand } from "./utils.js";
 const instance = yargs(hideBin(process.argv));
 
 [stage, publish, associate, test, destroy].forEach((cmd) =>
-  //TODO: fix this
-  instance.command(createCommand(cmd as any))
+  instance.command(createCommand(cmd as never))
 );
 
 instance.showHelpOnFail(false, "Specify --help for available options").argv;
