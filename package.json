@@ -26,7 +26,7 @@
     "precommit": "yarn prettier:fix && yarn lint:fix",
     "prepare": "husky install",
     "semantic-release": "semantic-release",
-    "prettier:check": "prettier --check **/* --loglevel error",
+    "prettier:check": "prettier --check **/* --loglevel error --no-error-on-unmatched-pattern",
     "prettier:fix": "prettier --write **/*",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
