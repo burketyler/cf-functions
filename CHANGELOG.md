@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/burketyler/cf-functions/compare/v1.1.1...v1.1.2) (2022-11-23)
+
+### Bug Fixes
+
+- remove sourcemap from output with typescript ([2a3729f](https://github.com/burketyler/cf-functions/commit/2a3729f6312175806edec9dc25f38d2e40c1073f))
+
 ## [1.1.1](https://github.com/burketyler/cf-functions/compare/v1.1.0...v1.1.1) (2022-11-19)
 
 ### Bug Fixes
