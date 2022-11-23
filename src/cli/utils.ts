@@ -147,7 +147,8 @@ export function parseHandlerCode(
 
   if (handlerPath.endsWith(".ts")) {
     code = tsService.compile(code, handlerPath);
-    code = code.replace(/(\/\/#\ssourceMappingURL=.*|export\s{.*};)/, "");
+    code = code.replace(/export\s{.*};/, "");
+    code = code.replace(/\/\/#\ssourceMappingURL=.*/, "");
 
     const imports = code.match(/import\s.*".*"/g);
 

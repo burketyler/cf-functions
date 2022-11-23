@@ -2,12 +2,12 @@ module.exports = {
   root: true,
   env: {
     node: true,
-    jest: true
+    jest: true,
   },
-  ignorePatterns: ["example"],
+  ignorePatterns: ["docs"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    "project": "./tsconfig.eslint.json"
+    project: "./tsconfig.eslint.json",
   },
   plugins: ["@typescript-eslint", "prettier", "import"],
   extends: [
