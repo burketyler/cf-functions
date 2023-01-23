@@ -1,0 +1,172 @@
+---
+id: getting-started
+---
+
+# Getting started
+
+This getting started guide will show you all you need to know in order to create a simple CloudFront Function
+which adds an HTTP header to an incoming request using the cf-functions library.
+
+### Pre-requisites
+
+If you haven't already, complete the steps in [setup](./setup.mdx).
+
+## Step 1: Create config file
+
+In the root directory of the project create a file named `cf-functions.ts`.
+This file contains function [configuration](./usage/configuration) and deployment information.
+
+```typescript
+// cf-functions.ts
+
+import { Config, DistributionEventType } from "cf-functions";
+
+const config: Config = {
+  defaultRuntime: "cloudfront-js-1.0",
+  functions: {
+    AddHeader: {
+      handler: "/handler.ts",
+      test: "/test.ts",
+      description:
+        "Adds the x-custom-header HTTP header to request.",
+      associations: [
+        {
+          distributionId: "MYDISTID",
+          eventType: DistributionEventType.VIEWER_REQUEST,
+          behaviourPattern: "default",
+        },
+      ],
+    },
+  },
+};
+
+export default config;
+```
+
+The above config outlines instructions for cf-functions to create a function named `AddHeader` that runs on the `cloudfront-js-1.0`
+runtime, executing on [viewer request](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/associate-function.html),
+which is associated with a CloudFront Distribution `MYDISTIS` on the `default` behaviour.
+
+## Step 2: Create function handler
+
+Create a file matching the handler file path for the `AddHeader` function supplied in the config above: `handler.ts`.
+
+```typescript
+// handler.ts
+
+import { FunctionEvent, HandlerReturn } from "cf-functions";
+
+function handler(event: FunctionEvent): HandlerReturn {
+    var headers = event.request.headers;
+
+    headers["x-custom-header"] = { value: "Cool beans!" };
+
+    return event.request;
+}
+```
+
+The handler code above simply adds a header named `x-custom-header` to the viewer request with a value of `Cool beans!`.
+For more information related to writing function code, refer to the AWS [programming model](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/writing-function-code.html)
+docs.
+
+## Step 3: Create handler tests
+
+Create a file matching the [handler test](./usage/testing) file path for the `AddHeader` function supplied in the config above: `test.ts`.
+
+```typescript
+// test.ts
+
+export default [
+    {
+        name: `It should add x-custom-header with value 'Cool beans!'.`,
+        given: {
+            request: {
+                method: "GET",
+                uri: "https://mysite.com",
+            },
+        },
+        expect: {
+            request: {
+                method: "GET",
+                uri: "https://mysite.com",
+                headers: {
+                    "x-custom-header": {
+                        value: "Cool beans!",
+                    },
+                },
+            },
+        },
+    }
+]
+```
+
+A test file expects a default export consisting of an array of test objects. Learn more about how function tests work
+in the [testing](./usage/testing) section.
+
+## Step 4: Deploy to AWS
+
+Deploying a function involves using the following CLI commands. Based on your desired workflow and CI/CD setup, you may
+not need them all.
+
+### Stage
+
+The stage command deploys the handler code for each configured function to the AWS CloudFront Functions `DEVELOPMENT`
+environment.
+
+```shell
+cf-functions stage
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/stage-example.mp4" type="video/mp4"/>
+</video>
+
+### Test
+
+The test command runs the test suite associated with each configured function.
+
+```shell
+cf-functions test -s DEVELOPMENT
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/test-example.mp4" type="video/mp4"/>
+</video>
+
+### Publish
+
+The publish command copies the handler code for each configured function from the `DEVELOPMENT` environment to the `LIVE`
+environment.
+
+```shell
+cf-functions publish
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/publish-example.mp4" type="video/mp4"/>
+</video>
+
+### Associate
+
+The associate command creates an association between a function deployed in the `LIVE` environment and an AWS CloudFront
+Distribution behaviour, for each configured function.
+
+```shell
+cf-functions associate
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/associate-example.mp4" type="video/mp4"/>
+</video>
+
+:::note
+
+It can take up to 5 minutes for the association to complete for the first time.
+
+:::
+
+## Next Steps
+
+That it! Your function is now live.
+
+Continue reading through this documentation to learn more about cf-functions.

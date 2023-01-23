@@ -1,0 +1,57 @@
+---
+id: setup
+---
+
+# Setup
+
+## Pre-requisites
+
+The cf-functions CLI tool uses the AWS SDK and therefore requires [AWS account credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
+configured on the machine in use.
+
+## Installation
+
+```shell
+yarn add --dev cf-functions ts-node typescript
+```
+
+## Configuration
+
+### ESM
+
+This package is [pure ESM](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c), meaning you must use
+ESM when setting up your project too. Ensure the package.json in your project has `module` for type.
+
+```json
+// package.json
+
+{
+  "type": "module",
+  ...
+}
+```
+
+### Typescript
+
+To allow ESM support, set the module to `NodeNext` as per below. It's also recommended to set the target to `es5` as that
+is the closest Ecmascript version to the CloudFront JS runtime.
+
+```json
+// tsconfig.json
+
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "NodeNext",
+        ...
+    },
+    ...
+}
+```
+
+### cf-functions.ts
+
+A [configuration](./usage/configuration) file named `cf-functions.ts` containing project configuration is required. The
+default location for the config file is the current working directory at runtime - generally the project root.
+
+

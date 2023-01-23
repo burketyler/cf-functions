@@ -1,0 +1,19 @@
+---
+id: environment-variables
+---
+
+# Environment Variables
+
+The framework uses [dotenv](https://www.npmjs.com/package/dotenv) to load environment variables at runtime. This is useful
+in cases where you want to deploy your functions to different environments without changing code.
+
+By default, the `.env` in the current working directory will be parsed (if it exists) when running any CLI command. The
+path to the environment variable can be explicitly specified using the `-e {pathToFile]` argument with any command.
+
+E.g.
+
+```shell
+cf-functions stage -e .env.production
+```
+
+Use `cf-functions help` for more information on commands.

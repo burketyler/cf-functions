@@ -1,0 +1,52 @@
+---
+## title: CF-Functions
+---
+
+import Badges from "../components/Badges";
+
+<Badges />
+
+# CF-Functions
+
+This framework is designed to make using AWS CloudFront Functions easy. Its aim is to shield developers from
+the complexity of the AWS API, letting them focus on the things that matter. Typescript is supported
+out of the box and a number of useful types at your fingertips.
+
+## Features
+
+### ⌨️ [Typescript](/docs/usage/typescript)
+
+Typescript is enabled by default. No need to compile to Javascript, we got you covered.
+
+### 🤖 [Deployment](/docs/usage/cli)
+
+Modular CLI commands are provided for creating, testing and deploying functions. Using the commands it's a breeze to
+automate your CI/CD workflow.
+
+### 🧪 [Testing](/docs/usage/testing)
+
+No nasty surprises. Ensure quality releases by creating and maintaining a suite of tests associated with your CloudFront
+Functions, using the built-in testing framework.
+
+### ⚙️ [Environment Variables](/docs/usage/environment-variables)
+
+Under the hood, [dotenv](https://www.npmjs.com/package/dotenv) is used to load environment configuration at runtime with zero
+setup, simply create a `.env` file and plug in your variables.
+
+## Getting Started
+
+Go to the [setup](./docs/setup) page to get started.
+
+## Examples
+
+Reference folder structure and example projects can be found in the
+[examples](https://github.com/burketyler/cf-functions/tree/master/examples) directory on GitHub.
+
+:::warning
+
+CF-Functions is in the early stages of development. It's likely that things will change somewhat
+rapidly and potentially in major ways before it reaches a production-ready level of maturity.
+
+At the moment, it's not recommended for production workloads.
+
+:::

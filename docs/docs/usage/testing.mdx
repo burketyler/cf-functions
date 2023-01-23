@@ -1,0 +1,81 @@
+# Testing
+
+Writing tests is important for any code, however it's particularly important for CloudFront Functions given the vastly
+[reduced functional capacity](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/functions-javascript-runtime-features.html)
+of the CloudFront JS runtime. Writing function tests ensures code meets the functional requirements it was written for,
+but also that it's compatible with the CloudFront JS runtime.
+
+A test file can be declared alongside a functions handler code via the [configuration file](./configuration) - refer to
+the config docs for more information.
+
+:::info
+
+While it's highly recommended to include handler tests, it's not required. Simply exclude the `test` command from your
+CI/CD workflow.
+
+:::
+
+## Test File
+
+A handler test file consists of an array of test case objects. The array must be the default export of the file. An
+example test file is included below.
+
+```typescript
+// test.ts
+
+export default [
+    {
+        name: `It should add x-custom-header with value 'Cool beans!'.`,
+        given: {
+            request: {
+                method: "GET",
+                uri: "https://mysite.com"
+            },
+        },
+        expect: {
+            request: {
+                method: "GET",
+                uri: "https://mysite.com",
+                headers: {
+                    "x-custom-header": {
+                        value: "Cool beans!",
+                    },
+                },
+            },
+        },
+    }
+];
+```
+
+A test case object consists of the following properties. For those familiar with Jest, this should look somewhat familiar.
+Use the full power of Typescript in generating test cases dynamically.
+
+| Name   | Type   | Description                                                                                 |
+|--------|--------|---------------------------------------------------------------------------------------------|
+| name   | String | The name of the test case.                                                                  |
+| given  | Object | A partial object imitating an incoming CloudFront request event.                            |
+| expect | Object | An object imitating the resulting CloudFront request event after the function code has run. |
+
+The object declared in `given` is merged with a [default request event](https://github.com/burketyler/cf-functions/blob/master/src/cli/commands/test/consts.ts)
+to prevent test cases from needing to specify the entire object on every test case. Just override the fields related to
+the test case with real values.
+
+Refer to the [AWS documentation](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/functions-event-structure.html)
+for more information relating to CloudFront event structures.
+
+## Test Runner
+
+CF-Functions includes a test runner compatible with the CloudFront test API, making it easy to create a test suite
+and automate test runs during deployments.
+
+Use the below command to run tests against a specific environment.
+
+```shell
+cf-functions test -s DEVELOPMENT
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/test-example.mp4" type="video/mp4"/>
+</video>
+
+Use `cf-functions help` for more information on commands.

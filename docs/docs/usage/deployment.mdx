@@ -1,0 +1,84 @@
+# Deployment
+
+The framework parses the [configuration](./configuration) file for deployment mappings when using any of the below commands.
+CloudFront Function deployments occur in four stages:
+
+1. Stage function in the `DEVELOPMENT` environment.
+2. Test function in the `DEVELOPMENT` environment.
+3. Publish function to the `LIVE` environment.
+4. Associate function with a CloudFront Distribution behaviour.
+
+<div style={{marginTop: "50px", display: "flex", justifyContent: "center"}}>
+    <a href={"/cf-functions/img/deploy-workflow.png"} target={"_blank"}>
+        <img
+            src={"/cf-functions/img/deploy-workflow.png"}
+            alt={"Deployment workflow"}
+        />
+    </a>
+</div>
+
+## 1. Stage
+
+Staging a function creates the function in CloudFront if it doesn't already exist, or updates the handler code
+(only in the `DEVELOPMENT` environment) if it does exist.
+
+Functions in the `DEVELOPMENT` environment cannot be associated with a distribution yet, but they can be tested. When
+developing your function code, you can use the `stage` command to push it to AWS for [testing](./testing).
+
+```shell
+cf-functions stage
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/stage-example.mp4" type="video/mp4"/>
+</video>
+
+## 2. Test
+
+Refer to the [testing](./testing) page for more information.
+
+## 3. Publish
+
+Publishing a function copies the function from the `DEVELOPMENT` environment to the `LIVE` environment. A function in the
+`LIVE` environment can be tested and additionally associated with CloudFront Distribution behaviours.
+
+When publishing a function to `LIVE`, any existing distribution associations will begin using the new version of the
+function.
+
+```shell
+cf-functions publish
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/publish-example.mp4" type="video/mp4"/>
+</video>
+
+## 4. Associate
+
+A function in the `LIVE` environment can be associated with a single or multiple CloudFront Distribution behaviour(s). Once
+an association is made, on either `viewer-request` or `viewer-response`, the function will be executed every time the
+distribution behaviour event occurs.
+
+:::info
+
+If your function associations are handled by an external system such as Terraform or the CDK, the `associate` command is
+not required, simply exclude this step from your CI/CD workflow.
+
+:::
+
+```shell
+cf-functions associate
+```
+
+<video width={"100%"} controls>
+    <source src="/cf-functions/video/associate-example.mp4" type="video/mp4"/>
+</video>
+
+:::note
+
+It can take up to 5 minutes for an associate command to complete, due to the fact that each CloudFront edge node needs
+to be updated for the distribution status to return to `DEPLOYED`.
+
+:::
+
+Use `cf-functions help` for more information on commands.

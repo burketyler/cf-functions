@@ -1,0 +1,54 @@
+# Configuration
+
+A configuration file is required to run any [CLI](./usage/cli) commands. This file contains function configuration and
+acts as a deployment manifest. For those familiar with the Serverless framework, it's analogous to a serverless.yml file.
+
+The file must `export default` an object matching the `Config` type.
+
+By default, the framework will look for a `cf-functions.ts` file in the current working directory when running a CLI
+command. This behaviour can be modified by including the `-c {filepath}` argument to any command.
+
+## Example
+
+```typescript
+import { Config, DistributionEventType } from "cf-functions";
+
+export const config: Config = {
+  pathPrefix: "/src/handlers",
+  defaultRuntime: "cloudfront-js-1.0",
+  functions: {
+    AddHeader: {
+      handler: "/add-header/index.ts",
+      test: "/add-header/test.ts",
+      description:
+          "Adds the x-custom-header HTTP header to request.",
+      associations: [
+        {
+          distributionId: process.env.DISTRIBUTION_ID!,
+          eventType: DistributionEventType.VIEWER_REQUEST,
+          behaviourPattern: "default",
+        },
+      ],
+    },
+  },
+};
+
+export default config;
+```
+
+## Reference
+
+| Name                                             | Type    | Description                                                                                 | isRequired |
+|--------------------------------------------------|---------|---------------------------------------------------------------------------------------------|------------|
+| pathPrefix                                       | String  | Path segment to prepend to any function handler or test file paths.                         | No         |
+| defaultRuntime                                   | String  | The CloudFront Function runtime to be used by each function.                                | No         |
+| functions                                        | Array   | Object map containing list of functions.                                                    | Yes        |
+| functions[Name]                                  | Key     | Each object key represents the name of a function.                                          | Yes        |
+| functions[Name].handler                          | String  | The file path to the function handler code.                                                 | Yes        |
+| functions[Name].test                             | String  | The file path to the function test code.                                                    | No         |
+| functions[Name].description                      | String  | A brief description of what the function does. This will appear in the AWS console.         | No         |
+| functions[Name].isEnabled                        | Boolean | Determines whether the function is ignored by CLI commands (defaults true)                  | No         |
+| functions[Name].associations                     | Array   | The CloudFront Distributions that the function is associated with.                          | Yes        |
+| functions[Name].associations[0].distributionId   | String  | The unique identifier of the CloudFront Distribution (found in the AWS console)             | Yes        |
+| functions[Name].associations[0].eventType        | String  | The CloudFront event which triggers the function - "viewer-request" or "viewer-response"    | Yes        |
+| functions[Name].associations[0].behaviourPattern | String  | The string pattern of the CloudFront Distribution behaviour to associate the function with. | Yes        |
