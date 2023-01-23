@@ -25,7 +25,7 @@ import {
   settlePromises,
 } from "../../utils.js";
 
-import { DEFAULT_EVENT_OBJECT } from "./consts.js";
+import { DEFAULT_TEST_EVENT_OBJECT } from "./consts.js";
 import {
   TestArgs,
   TestCase,
@@ -183,7 +183,7 @@ function mergeEventObject(
   eventObject: ViewerRequestTestObject | ViewerResponseTestObject,
   config: FunctionConfig
 ): string {
-  const defaults = cloneDeep(DEFAULT_EVENT_OBJECT);
+  const defaults = cloneDeep(DEFAULT_TEST_EVENT_OBJECT);
   const { distributionId, eventType } = config.associations[0];
 
   if (eventType === DistributionEventType.VIEWER_REQUEST) {

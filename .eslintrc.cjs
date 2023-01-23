@@ -4,7 +4,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ["docs"],
+  ignorePatterns: ["docs", "examples"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: "./tsconfig.eslint.json",

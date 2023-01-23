@@ -1,6 +1,6 @@
 import { FunctionEvent } from "../../../aws/index.js";
 
-export const DEFAULT_EVENT_OBJECT: FunctionEvent = {
+export const DEFAULT_TEST_EVENT_OBJECT: FunctionEvent = {
   version: "1.0",
   context: {
     distributionDomainName: "",

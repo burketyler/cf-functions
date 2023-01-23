@@ -400,7 +400,7 @@ function assertFunctionDistributionCompatibility(
         !doesBehaviourExist(behaviourPattern, distributionMap[distributionId])
       ) {
         logger.fatal(
-          `Distribution '${distributionId}' has no cache behaviour matching pattern '${behaviourPattern}'. Unable to associate function '${functionName}'.`
+          `Distribution '${distributionId}' has no behaviour matching pattern '${behaviourPattern}'. Unable to associate function '${functionName}'.`
         );
         process.exit(1);
       }
