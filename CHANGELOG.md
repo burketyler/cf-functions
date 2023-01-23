@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/burketyler/cf-functions/compare/v1.1.2...v1.1.3) (2023-01-23)
+
+### Bug Fixes
+
+- add readme page ([8aca781](https://github.com/burketyler/cf-functions/commit/8aca781fb43ee1285897c4e2ab510f45ce37d944))
+
 ## [1.1.2](https://github.com/burketyler/cf-functions/compare/v1.1.1...v1.1.2) (2022-11-23)
 
 ### Bug Fixes
